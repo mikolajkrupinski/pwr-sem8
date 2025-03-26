@@ -57,7 +57,7 @@ int main() {
 
 size_t access(std::vector<uint16_t> &list, uint16_t i, Ordering order,
               std::vector<size_t> *counter) {
-  size_t cost = 0;
+  size_t cost = 1;
 
   auto curr = list.begin();
   while (curr != list.end() && *curr != i) {
