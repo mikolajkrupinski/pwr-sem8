@@ -34,13 +34,13 @@ solve;
 
 for {A in cities}: {
     for {B in cities : transport1[A, B] > 0}: {
-        printf "1 %s -> %s : %d\n", A, B, transport1[A, B];
+        printf "1 %s -> %s : %f\n", A, B, transport1[A, B];
     }
     for {B in cities : transport2[A, B] > 0}: {
-        printf "2 %s -> %s : %d\n", A, B, transport2[A, B];
+        printf "2 %s -> %s : %f\n", A, B, transport2[A, B];
     }
 }
 
-display transport_cost;
+printf "Total transport cost : %f\n", transport_cost.val;
 
 end;
