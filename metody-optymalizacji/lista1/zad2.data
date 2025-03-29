@@ -1,0 +1,54 @@
+data;
+
+set cities := "Opole" "Brzeg" "Nysa" "Prudnik" "Strzelce Opolskie" "Kozle" "Raciborz";
+
+param supply1 :=
+    "Opole"             7
+    "Brzeg"             0
+    "Nysa"              6
+    "Prudnik"           0
+    "Strzelce Opolskie" 5
+    "Kozle"             0
+    "Raciborz"          0
+    ;
+
+param supply2 :=
+    "Opole"              0
+    "Brzeg"              1
+    "Nysa"               2
+    "Prudnik"            10
+    "Strzelce Opolskie"  0
+    "Kozle"              0
+    "Raciborz"           0
+    ;
+
+param demand1 :=
+    "Opole"              0
+    "Brzeg"              10
+    "Nysa"               0
+    "Prudnik"            4
+    "Strzelce Opolskie"  0
+    "Kozle"              8
+    "Raciborz"           0
+    ;
+
+param demand2 :=
+    "Opole"             2
+    "Brzeg"             0
+    "Nysa"              0
+    "Prudnik"           0
+    "Strzelce Opolskie" 4
+    "Kozle"             2
+    "Raciborz"          1
+    ;
+
+param distance:
+                     "Opole"  "Brzeg"  "Nysa"  "Prudnik"  "Strzelce Opolskie"  "Kozle"  "Raciborz" :=
+    "Opole"             0        45       60      55         30                  50       80
+    "Brzeg"             45       0        55      80         80                  90       130
+    "Nysa"              60       55       0       30         95                  70       90
+    "Prudnik"           55       80       30      0          70                  45       60
+    "Strzelce Opolskie" 30       80       95      70         0                   30       60
+    "Kozle"             50       90       70      45         30                  0        35
+    "Raciborz"          80       130      90      60         60                  35       0
+    ;
