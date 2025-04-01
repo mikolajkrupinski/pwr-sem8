@@ -1,0 +1,62 @@
+\documentclass[12pt]{article}
+\usepackage{algorithm2e}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{polski}
+\geometry{a4paper, margin=1in}
+
+\title{Rozwiązanie Listy 1 z Metod Optymalizacji}
+\author{Mikołaj Krupiński}
+
+\begin{document}
+
+\maketitle
+
+\section*{Zadanie 1}
+
+Wejściem do modelu jest liczba naturalna $n \geq 1$. Na jej podstawie jest budowana macierz Hilberta $A \in \mathbb{R}^{n \times n}$ taka, że
+\[ \left(\forall i, j \in \{1,...,n\}\right)\left(a_{ij} = \frac{1}{i+j-1}\right) \]
+oraz wektor $b, c \in \mathbb{R}^n$ taki, że
+\[ \left(\forall i \in \{1,...,n\}\right)\left(b_i = c_i = \sum_{j=1}^{n} \frac{1}{i+j-1}
+\right). \]
+Zadaniem jest rozwiązanie następującego problemu programowania liniowego:
+\[ \min c^Tx \]
+przy ograniczeniu
+\[ Ax = b. \]
+Rozwiązaniem problemu jest wektor jednostkowy $x = [1, 1, ..., 1]^T$.
+
+Problem został rozwiązany przy użyciu solvera \texttt{GNU MathProg}. Błędy względne rozwiązań zwróconych przez solver w podwójnej precyzji prezentuję w tabeli poniżej.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        n & $\varepsilon $ \\
+        \hline
+        4 & 0.000000000000327 \\
+        5 & 0.000000000003351 \\
+        6 & 0.000000000068334 \\
+        7 & 0.000000016786854 \\
+        8 & 0.514058972177268 \\
+        9 & 0.682911338087722 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Błąd względny rośnie bardzo szybko i już dla małego $n=8$ osiąga wartość większą niż $\frac{1}{2}$. Z dokładnością do dwóch cyfr jesteśmy w stanie rozwiązać ten problem dla $n \leq 7$.
+
+\section*{Zadanie 2}
+
+
+
+\end{document}
