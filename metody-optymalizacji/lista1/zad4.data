@@ -1,0 +1,114 @@
+data;
+
+set classes := "Algebra" "Analiza" "Fizyka" "Chemia min." "Chemia org.";
+param max_hours_per_day := 4;
+param groups_days :=
+    ["Algebra", 1] 1
+    ["Algebra", 2] 2
+    ["Algebra", 3] 3
+    ["Algebra", 4] 3
+    ["Analiza", 1] 1
+    ["Analiza", 2] 2
+    ["Analiza", 3] 3
+    ["Analiza", 4] 4
+    ["Fizyka", 1] 2
+    ["Fizyka", 2] 2
+    ["Fizyka", 3] 4
+    ["Fizyka", 4] 4
+    ["Chemia min.", 1] 1
+    ["Chemia min.", 2] 1
+    ["Chemia min.", 3] 4
+    ["Chemia min.", 4] 5
+    ["Chemia org.", 1] 1
+    ["Chemia org.", 2] 1
+    ["Chemia org.", 3] 5
+    ["Chemia org.", 4] 5
+    ;
+param groups_start_time :=
+    ["Algebra", 1] 13
+    ["Algebra", 2] 10
+    ["Algebra", 3] 10
+    ["Algebra", 4] 11
+    ["Analiza", 1] 13
+    ["Analiza", 2] 10
+    ["Analiza", 3] 11
+    ["Analiza", 4] 8
+    ["Fizyka", 1] 8
+    ["Fizyka", 2] 10
+    ["Fizyka", 3] 15
+    ["Fizyka", 4] 17
+    ["Chemia min.", 1] 8
+    ["Chemia min.", 2] 8
+    ["Chemia min.", 3] 13
+    ["Chemia min.", 4] 13
+    ["Chemia org.", 1] 9
+    ["Chemia org.", 2] 10.5
+    ["Chemia org.", 3] 11
+    ["Chemia org.", 4] 13
+    ;
+param groups_end_time :=
+    ["Algebra", 1] 15
+    ["Algebra", 2] 12
+    ["Algebra", 3] 12
+    ["Algebra", 4] 13
+    ["Analiza", 1] 15
+    ["Analiza", 2] 12
+    ["Analiza", 3] 13
+    ["Analiza", 4] 10
+    ["Fizyka", 1] 11
+    ["Fizyka", 2] 13
+    ["Fizyka", 3] 18
+    ["Fizyka", 4] 20
+    ["Chemia min.", 1] 10
+    ["Chemia min.", 2] 10
+    ["Chemia min.", 3] 15
+    ["Chemia min.", 4] 15
+    ["Chemia org.", 1] 10.5
+    ["Chemia org.", 2] 12
+    ["Chemia org.", 3] 12.5
+    ["Chemia org.", 4] 14.5
+    ;
+param groups_preference :=
+    ["Algebra", 1] 5
+    ["Algebra", 2] 4
+    ["Algebra", 3] 10
+    ["Algebra", 4] 5
+    ["Analiza", 1] 4
+    ["Analiza", 2] 4
+    ["Analiza", 3] 5
+    ["Analiza", 4] 6
+    ["Fizyka", 1] 3
+    ["Fizyka", 2] 5
+    ["Fizyka", 3] 7
+    ["Fizyka", 4] 8
+    ["Chemia min.", 1] 10
+    ["Chemia min.", 2] 10
+    ["Chemia min.", 3] 7
+    ["Chemia min.", 4] 5
+    ["Chemia org.", 1] 0
+    ["Chemia org.", 2] 5
+    ["Chemia org.", 3] 3
+    ["Chemia org.", 4] 4
+    ;
+param sport_groups_days :=
+    1 1
+    2 3
+    3 3
+    ;
+param sport_groups_start_time :=
+    1 13
+    2 11
+    3 13
+    ;
+param sport_groups_end_time :=
+    1 15
+    2 13
+    3 15
+    ;
+param lunch_break_start := 12;
+param lunch_break_end := 14;
+param min_lunch_break_time := 1;
+
+# 4.2 parameters
+param min_preference := 5;
+set allowed_days_of_week := 1 2 4;

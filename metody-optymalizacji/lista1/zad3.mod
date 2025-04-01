@@ -1,63 +1,64 @@
-set JednostkiDestylacji;
-set Produkty;
-set ProduktyKoncowe;
-param WydajnoscDestylacji{JednostkiDestylacji, Produkty};
-param WydajnoscKrakowania{Produkty};
-param MimimalnyPopyt{ProduktyKoncowe};
-param KosztJednostkiDestylacji{JednostkiDestylacji};
-param KosztDestylacji;
-param KosztKrakowania;
-param SiarkaWOleju{JednostkiDestylacji};
-param SiarkaWOlejuPoKrakowaniu{JednostkiDestylacji};
-param MaksymalnaSiarkaWOlejuDomowym;
+set JednostkiDestylacji; # Nazwy jednostek destylacji
+set Produkty; # Nazwy produktów wyjściowych z jednostek destylacji
+set ProduktyKoncowe; # Nazwy produktów końcowych
+param WydajnoscDestylacji{JednostkiDestylacji, Produkty}; # Wydajność destylacji według jednostek destylacji i produktów
+param WydajnoscKrakowania{Produkty}; # Wydajność krakowania według produktów
+param MimimalnyPopyt{ProduktyKoncowe}; # Minimalny popyt na produkty końcowe
+param KosztJednostkiDestylacji{JednostkiDestylacji}; # Koszt destylacji 1t ropy w jednostkach destylacji
+param KosztDestylacji; # Koszt destylacji 1t ropy
+param KosztKrakowania; # Koszt krakowania 1t destylatu
+param SiarkaWOleju{JednostkiDestylacji}; # Zawartość siarki w oleju w jednostkach destylacji
+param SiarkaWOlejuPoKrakowaniu{JednostkiDestylacji}; # Zawartość siarki w oleju po krakowaniu
+param MaksymalnaSiarkaWOlejuDomowym; # Maksymalna zawartość siarki w oleju domowym
 
-var Ropa{JednostkiDestylacji} >= 0;
+var Ropa{JednostkiDestylacji} >= 0; # Ilość ropy do przetworzenia w jednostkach destylacji
 
-var IloscProduktow{JednostkiDestylacji, Produkty} >= 0;
-s.t. ilosc_produktow_koncowych {JD in JednostkiDestylacji, P in Produkty}:
+var IloscProduktow{JednostkiDestylacji, Produkty} >= 0; # Ilość produktów wyjściowych z jednostek destylacji
+s.t. ilosc_produktow_koncowych {JD in JednostkiDestylacji, P in Produkty}: # Ilość produktów wyjściowych proporcjonalna do wydajności destylacji
     IloscProduktow[JD, P] = Ropa[JD] * WydajnoscDestylacji[JD, P];
 
-var IloscDestylatuDoKrakowania{JednostkiDestylacji} >= 0;
-s.t. ilosc_produktow_do_krakowania {JD in JednostkiDestylacji}:
+var IloscDestylatuDoKrakowania{JednostkiDestylacji} >= 0; # Ilość destylatu do krakowania w jednostkach destylacji
+s.t. ilosc_produktow_do_krakowania {JD in JednostkiDestylacji}: # Ilość destylatu do krakowania mniejsza od ilości destylatu
     IloscDestylatuDoKrakowania[JD] <= IloscProduktow[JD, "Destylat"];
 
-var IloscProduktowPoKrakowaniu{JednostkiDestylacji, Produkty} >= 0;
-s.t. ilosc_produktow_po_krakowaniu {JD in JednostkiDestylacji, P in Produkty}:
+var IloscProduktowPoKrakowaniu{JednostkiDestylacji, Produkty} >= 0; # Ilość produktów po krakowaniu
+s.t. ilosc_produktow_po_krakowaniu {JD in JednostkiDestylacji, P in Produkty}: # Ilość produktów po krakowaniu proporcjonalna do wydajności krakowania
     IloscProduktowPoKrakowaniu[JD, P] = IloscDestylatuDoKrakowania[JD] * WydajnoscKrakowania[P];
 
-var IloscOlejuDoDomowego{JednostkiDestylacji} >= 0;
-s.t. ilosc_oleju_do_domowego {JD in JednostkiDestylacji}:
+var IloscOlejuDoDomowego{JednostkiDestylacji} >= 0; # Ilość oleju do domowego oleju według jednostek destylacji
+s.t. ilosc_oleju_do_domowego {JD in JednostkiDestylacji}: # Ilość oleju do domowego użytku mniejsza od ilości oleju
     IloscOlejuDoDomowego[JD] <= IloscProduktow[JD, "Olej"];
 
-var IloscProduktowKoncowych{ProduktyKoncowe} >= 0;
-s.t. ilosc_produktow_koncowych_paliwa_silnikowe:
+var IloscProduktowKoncowych{ProduktyKoncowe} >= 0; # Ilość produktów końcowych
+s.t. ilosc_produktow_koncowych_paliwa_silnikowe: # Ilość paliw silnikowych
     IloscProduktowKoncowych["Paliwa silnikowe"] =
         sum{JD in JednostkiDestylacji} (IloscProduktow[JD, "Benzyna"] + IloscProduktowPoKrakowaniu[JD, "Benzyna"]);
-s.t. ilosc_produktow_koncowych_domowe_paliwa_olejowe:
+s.t. ilosc_produktow_koncowych_domowe_paliwa_olejowe: # Ilość domowych paliw olejowych
     IloscProduktowKoncowych["Domowe paliwa olejowe"] =
         sum{JD in JednostkiDestylacji} (IloscOlejuDoDomowego[JD] + IloscProduktowPoKrakowaniu[JD, "Olej"]);
-s.t. ilosc_produktow_koncowych_ciezkie_paliwa_olejowe:
+s.t. ilosc_produktow_koncowych_ciezkie_paliwa_olejowe: # Ilość ciężkich paliw olejowych
     IloscProduktowKoncowych["Ciezkie paliwa olejowe"] =
-        sum{JD in JednostkiDestylacji} (IloscProduktow[JD, "Resztki"] + IloscProduktow[JD, "Olej"] - IloscOlejuDoDomowego[JD] +
-        IloscProduktowPoKrakowaniu[JD, "Resztki"]);
-s.t. popyt_na_produkty_koncowe {P in ProduktyKoncowe}:
+        sum{JD in JednostkiDestylacji} ((IloscProduktow[JD, "Destylat"] - IloscDestylatuDoKrakowania[JD]) + (IloscProduktow[JD, "Olej"] - IloscOlejuDoDomowego[JD]) + IloscProduktow[JD, "Resztki"] + IloscProduktowPoKrakowaniu[JD, "Resztki"]);
+s.t. popyt_na_produkty_koncowe {P in ProduktyKoncowe}: # Popyt na produkty końcowe spełniony
     IloscProduktowKoncowych[P] >= MimimalnyPopyt[P];
 
-minimize koszt_produkcji:
+var WagaSiarkiWOlejuDomowym >= 0; # Waga siarki w oleju domowym
+s.t. waga_siarki_w_oleju_domowym: # Waga siarki w oleju domowym
+    WagaSiarkiWOlejuDomowym =
+        sum{JD in JednostkiDestylacji} (IloscOlejuDoDomowego[JD] * SiarkaWOleju[JD] +
+        IloscProduktowPoKrakowaniu[JD, "Olej"] * SiarkaWOlejuPoKrakowaniu[JD]);
+
+s.t. maksymalna_waga_siarki_w_oleju_domowym: # Maksymalna waga siarki w oleju domowym
+    WagaSiarkiWOlejuDomowym <= IloscProduktowKoncowych["Domowe paliwa olejowe"] * MaksymalnaSiarkaWOlejuDomowym;
+
+minimize koszt_produkcji: # Całkowity koszt produkcji
     sum{JD in JednostkiDestylacji}
         (Ropa[JD] * (KosztJednostkiDestylacji[JD] + KosztDestylacji) + IloscDestylatuDoKrakowania[JD] * KosztKrakowania);
 
-s.t. maksymalna_siarka_w_oleju_domowym:
-    sum{JD in JednostkiDestylacji} (IloscOlejuDoDomowego[JD] * SiarkaWOleju[JD] +
-    IloscProduktowPoKrakowaniu[JD, "Olej"] * SiarkaWOlejuPoKrakowaniu[JD]) <=
-    IloscProduktowKoncowych["Domowe paliwa olejowe"] * MaksymalnaSiarkaWOlejuDomowym;
-
 solve;
 
-display koszt_produkcji;
-display IloscOlejuDoDomowego;
-display IloscProduktow;
 display Ropa;
+display koszt_produkcji;
 display IloscProduktowKoncowych;
 
 data;

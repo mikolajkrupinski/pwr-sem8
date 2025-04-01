@@ -1,25 +1,16 @@
-/* Data declaration */
+param n, integer, >= 1; # Wymiar macierzy Hilberta
+set N := {1..n}; # Zbiór indeksów
+param A{i in N, j in N} := 1 / (i + j - 1); # Macierz Hilberta
+param b{i in N} := sum{j in N} A[i, j]; # Wektor prawych stron
+param expected_x{i in N} := 1; # Oczekiwany wektor rozwiązań
 
-param n, integer, >= 1;
-set N := {1..n};
-param A{i in N, j in N} := 1 / (i + j - 1);
-param b{i in N} := sum{j in N} A[i, j];
-param expected_x{i in N} := 1;
+var x{N} >= 0; # Wektor zmiennych decyzyjnych
 
-/* Decision variables */
-
-var x{N} >= 0;
-
-/* Objective function */
-minimize objective_function:
+minimize objective_function: # Funkcja celu
     sum{i in N} (b[i] * x[i]);
 
-/* Constraints */
-
-s.t. Ax_equal_b {i in N}:
+s.t. Ax_equal_b {i in N}: # Ograniczenie na Ax=b
     sum{j in N} (A[i, j] * x[j]) = b[i];
-
-/* Solve and display data */
 
 solve;
 

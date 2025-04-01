@@ -1,34 +1,24 @@
-/* Data declaration */
+set cities; # Zbiór miast
+param distance{cities, cities} >= 0; # Macierz odległości między miastami
+param supply1{cities} >= 0; # Nadmiar dźwigów typu I według miast
+param supply2{cities} >= 0; # Nadmiar dźwigów typu II według miast
+param demand1{cities} >= 0; # Niedobór dźwigów typu I według miast
+param demand2{cities} >= 0; # Niedobór dźwigów typu II według miast
 
-set cities;
-param distance{cities, cities} >= 0;
-param supply1{cities} >= 0;
-param supply2{cities} >= 0;
-param demand1{cities} >= 0;
-param demand2{cities} >= 0;
+var transport1{cities, cities} >= 0; # transport1{A, B} - ilość dźwigów typu I transportowanych z miasta A do B
+var transport2{cities, cities} >= 0; # transport2{A, B} - ilość dźwigów typu II transportowanych z miasta A do B
 
-/* Decision variables */
-
-var transport1{cities, cities} >= 0;
-var transport2{cities, cities} >= 0;
-
-/* Objective function */
-
-minimize transport_cost:
+minimize transport_cost: # Sumaryczny koszt transportu wszytskich dźwigów
     sum{A in cities, B in cities} (transport1[A, B] * distance[A, B] + 1.2 * transport2[A, B] * distance[A, B]);
 
-/* Constraints */
-
-s.t. demand1_constraint {A in cities}:
+s.t. demand1_constraint {A in cities}: # Zaspokojenie popytu na dźwigi typu I, dźwig typu I może być zastąpiony przez typu II
     sum{B in cities} (transport1[B, A] + transport2[B, A]) >= demand1[A] + demand2[A];
-s.t. supply1_constraint {A in cities}:
+s.t. supply1_constraint {A in cities}: # Nieprzekroczenie podaży dźwigów typu I
     sum{B in cities} transport1[A, B] <= supply1[A];
-s.t. demand2_constraint {A in cities}:
+s.t. demand2_constraint {A in cities}: # Zaspokojenie popytu na dźwigi typu II
     sum{B in cities} transport2[B, A] >= demand2[A];
-s.t. supply2_constraint {A in cities}:
+s.t. supply2_constraint {A in cities}: # Nieprzekroczenie podaży dźwigów typu II
     sum{B in cities} transport2[A, B] <= supply2[A];
-
-/* Solve and display data */
 
 solve;
 
