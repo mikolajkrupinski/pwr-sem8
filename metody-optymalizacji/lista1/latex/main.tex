@@ -57,6 +57,17 @@ Błąd względny rośnie bardzo szybko i już dla małego $n=8$ osiąga wartoś�
 
 \section*{Zadanie 2}
 
+Problem w zadaniu polega na przetransportowaniu dźwigów między zadnymi miastami tak, by zaspokoić niedobory dźwigów, minimaliluząc przy tym koszt całej operacji.
 
+Zmienne decyzyjne zdefifniowałem jako
+\[ T_{I}[A,B], T_{II}[A,B] : A,B \in M. \]
+Oznaczają one odpowiednio liczbę dźwigów typu I i typu II, którą należy przetransportować z miasta $A$ do miasta $B$.
+
+Funkcją celu jest całkowity koszt przetransportowoania dźwigów:
+\[ \min \sum_{A,B \in M} \left( K_{I} \cdot D_{A,B} \cdot T_{I}[A,B] + K_{II} \cdot D_{A,B} \cdot T_{II}[A,B] \right). \]
+
+\begin{flalign*}
+    && x && y &&
+\end{flalign*}
 
 \end{document}
