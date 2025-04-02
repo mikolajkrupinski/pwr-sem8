@@ -1,3 +1,5 @@
+# Mikołaj Krupiński, zadanie 1
+
 param n, integer, >= 1; # Wymiar macierzy Hilberta
 set N := {1..n}; # Zbiór indeksów
 param A{i in N, j in N} := 1 / (i + j - 1); # Macierz Hilberta

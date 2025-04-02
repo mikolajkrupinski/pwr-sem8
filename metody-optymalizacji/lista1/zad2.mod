@@ -1,3 +1,5 @@
+# Mikołaj Krupiński, zadanie 2
+
 set cities; # Zbiór miast
 param distance{cities, cities} >= 0; # Macierz odległości między miastami
 param supply1{cities} >= 0; # Nadmiar dźwigów typu I według miast

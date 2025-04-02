@@ -60,14 +60,276 @@ Błąd względny rośnie bardzo szybko i już dla małego $n=8$ osiąga wartoś�
 Problem w zadaniu polega na przetransportowaniu dźwigów między zadnymi miastami tak, by zaspokoić niedobory dźwigów, minimaliluząc przy tym koszt całej operacji.
 
 Zmienne decyzyjne zdefifniowałem jako
-\[ T_{I}[A,B], T_{II}[A,B] : A,B \in M. \]
-Oznaczają one odpowiednio liczbę dźwigów typu I i typu II, którą należy przetransportować z miasta $A$ do miasta $B$.
+\begin{flalign*}
+    && T_{I}[A,B], T_{II}[A,B] \in \mathbb{N} && A,B \in M &&
+\end{flalign*}
+gdzie $M$ jest zbiorem miast. Oznaczają one odpowiednio liczbę dźwigów typu I i typu II, którą należy przetransportować z miasta $A$ do miasta $B$.
 
 Funkcją celu jest całkowity koszt przetransportowoania dźwigów:
-\[ \min \sum_{A,B \in M} \left( K_{I} \cdot D_{A,B} \cdot T_{I}[A,B] + K_{II} \cdot D_{A,B} \cdot T_{II}[A,B] \right). \]
+\[ \min \sum_{A,B \in M} \left( K_{I} \cdot D_{A,B} \cdot T_{I}[A,B] + K_{II} \cdot D_{A,B} \cdot T_{II}[A,B] \right), \]
+gdzie $K_{I}$ i $K_{II}$ to odpowiednio koszt transportu dźwigów typu I i II, a $D_{A,B}$ to odległość między miastami $A$ i $B$. W zadaniu przyjęto, że $K_{I} = 1$ oraz $K_{II} = 1.2$.
 
+Jako parametry mamy zadane również macierze $S_1,S_2$ i $Q_1,Q_2$ oznaczające odpowiednio zapotrzebowanie i nadwyżkę dźwigów typu $I$ i $II$ w miastach.
+
+Pierwsze ograniczenie gwarantuje zaspokojenie popytu na dźwigi typu $I$ w każdym mieście. Dźwigi typu $I$ mogą zostac zastąpione także przez dźwigi typu $II$.
 \begin{flalign*}
-    && x && y &&
+    && \sum_{B \in M} \left( T_1[B,A] + T_2[B,A] \right) \geq Q_1 + Q_2 && (\forall A \in M) &&
 \end{flalign*}
+
+Drugie ograniczenie zapewnia zaspokojenie popytu na dźwigi typu $II$.
+\begin{flalign*}
+    && \sum_{B \in M} T_2[B,A] \geq Q_2 && (\forall A \in M) &&
+\end{flalign*}
+
+Kolejne ograniczenia gwarantują, że z żadnego miasta nie zostanie przetransportowane więcej dźwigów niż jest dostępne.
+\begin{flalign*}
+    && \sum_{B \in M} T_1[A,B] \leq S_1[A] && (\forall A \in M) &&
+\end{flalign*}
+\begin{flalign*}
+    && \sum_{B \in M} T_2[A,B] \leq S_2[A] && (\forall A \in M) &&
+\end{flalign*}
+
+Rozwiązanie problemu dla zadanych w treści zadania danych wygląda następująco.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c||c|c|}
+        \hline
+        Z miasta & Do miasta & Liczba dźwigów $I$ & Liczba dźwigów $II$ \\
+        \hline
+        Opole & Brzeg & 4 &  \\
+        Opole & Koźle & 3 &  \\
+        Brzeg & Brzeg &  & 1 \\
+        Nysa & Brzeg & 5 &  \\
+        Nysa & Prudnik & 1 &  \\
+        Nysa & Opole &  & 2 \\
+        Prudnik & Prudnik &  & 3 \\
+        Prudnik & Strzelce Opolskie &  & 4 \\
+        Prudnik & Koźle &  & 2 \\
+        Prudnik & Racibórz &  & 1 \\
+        Strzelce Opolskie & Koźle & 5 &  \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Przedstawione rozwiązanie jest dopuszczalne.
+
+Zdjęcie ograniczenia na całkowitoliczbowośc i pozostawienie jedynie ograniczenia na nieujemność zmiennych decyzyjnych nie zmienia rozwiązania zwracanego przez solver.
+
+\section*{Zadanie 3}
+
+W tym zadaniu dany jest system połączeń między jednostkami destylacji ropy oraz jednostką krakowania. Celem jest zminimalizowanie kosztu produkcji produktów końcowych przy zadanych ograniczeniach.
+
+Parametrami wejściowymi do modeulu są:
+\begin{itemize}
+    \item $JD$ - zbiór jednostkek destylacji,
+    \item $P$ - zbiór produktów wyjściowych z jednostek destylacji,
+    \item $PK$ - zbiór produktów końcowych,
+    \item $WD$ - macierz opisująca wydajność jednostek destylacji według poszczególnych produktów,
+    \item $WK$ - wektor opisujący wydajność jednostek krakowania według poszczególnych produktów,
+    \item $MP$ - wektor opisujący minimalny popyt na produkty końcowe,
+    \item $KJD$ - wektor kosztów jednostek destylacji za $1t$ ropy,
+    \item $\mathcal{KD}$ - koszt destylacji $1t$ ropy,
+    \item $\mathcal{KK}$ - koszt krakowania $1t$ destylatu,
+    \item $SO$ - wektor zawartości siarki w oleju według jednostek destylacji,
+    \item $SOK$ - wektor zawartości siarki w oleju według jednostek krakowania i jednostek destylacji,
+    \item $\mathcal{MS}$ - maksymalna zawartość siarki w oleju domowym.
+\end{itemize}
+
+Głównymi zmiennymi decyzyjnymi są ilości ropy, które należy przetworzyć w jednostkach destylacji.
+\begin{flalign*}
+    && r_{jd} \geq 0 && jd \in JD &&
+\end{flalign*}
+
+Pomocniczniczymi zmiennymi decyzyjnymi są ilości produktów uzyskanych w jednostkach destylacji.
+\begin{flalign*}
+    && p_{p,jd} \geq 0 && p \in P, jd \in JD &&
+\end{flalign*}
+Powyższe musi być zgodne z poniższym ograniczeniem.
+\begin{flalign*}
+    && p_{p,jd} = r_{jd} \cdot WD[jd,p] && (\forall p \in P)(\forall jd \in JD) &&
+\end{flalign*}
+
+Kolejnymi zmiennymi decyzyjnymi są ilości destylatu przeznaczonego do krakowania według jednostek destylacji.
+\begin{flalign*}
+    && d_{jd} \geq 0 && jd \in JD &&
+\end{flalign*}
+Ilość destylatu przeznaczonego do krakowania nie może być większa od ilości wyprodukowanego destylatu.
+\begin{flalign*}
+    && d_{jd} \leq p_{p,jd} && (\forall jd \in JD) &&
+\end{flalign*}
+
+Na podstawie tego budujemy kolejną zmienną pomocniczą oznaczającą ilość produktów uzyskanych w procesie krakowania w zależności od jednostek destylacji, w których był wyprodukowany destylat.
+\begin{flalign*}
+    && pk_{p,jd} \geq 0 && p \in P, jd \in JD &&
+\end{flalign*}
+\begin{flalign*}
+    && pk_{p,jd} = d_{jd} \cdot WK[jd,p] && (\forall p \in PK)(\forall jd \in JD) &&
+\end{flalign*}
+
+Dodajemy zmienną decyzyjną repprezentującą ilość ton oleju przeznaczoną na produkcję domowych paliw olejowych.
+\begin{flalign*}
+    && o_{jd} \geq 0 && jd \in JD &&
+\end{flalign*}
+Ilość oleju przeznaczonego na produkcję domowych paliw olejowych nie może być większa od ilości wyprodukowanego oleju.
+\begin{flalign*}
+    && o_{jd} \leq p_{\text{Olej},jd} && (\forall jd \in JD) &&
+\end{flalign*}
+
+Na podstawie powyższych informacji możemy wyznaczyć ilości produktów końcowych uzyskanych w całym procesie obróbki ropy. Tworzymy zmienne pomocnicze reprezentujące ich ilości.
+\begin{flalign*}
+    && k_{p} \geq 0 && p \in PK &&
+\end{flalign*}
+Na podstawie danych w zadaniu możemy wyznaczy ilości produktów końcowych następującymi ograniczeniami.
+\begin{flalign*}
+    && k_{\text{Paliwa silnikowe}} = \sum_{jd \in JD} (p_{\text{Benzyna},jd} + pk_{\text{Benzyna},jd}) &&
+\end{flalign*}
+\begin{flalign*}
+    && k_{\text{Domowe paliwa olejowe}} = \sum_{jd \in JD} (o_{jd} + pk_{\text{Olej},jd}) &&
+\end{flalign*}
+\begin{flalign*}
+    && k_{\text{Ciężkie paliwa olejowe}} = &&
+\end{flalign*}
+\begin{flalign*}
+    && = \sum_{jd \in JD} ((p_{\text{Destylat},jd}-d_{jd}) + (p_{\text{Olej},jd}-o_{jd}) + p_{\text{Resztki},jd} + pk_{\text{Resztki},jd}) &&
+\end{flalign*}
+
+Teraz możemy nałożyć ograniczenie na minimalną ilość produktów końcowych.
+\begin{flalign*}
+    && k_{p} \geq MP[p] && (\forall p \in PK) &&
+\end{flalign*}
+
+Na koniec dodajmy ograniczenie gwarantujące nieprzekroczenie maksymalnej ilości siarku w domowych paliwach olejowych.
+\[ \sum_{jd \in JD} (o_{jd} \cdot SO[jd] + pk_{\text{Olej},jd} \cdot SOK[jd]) \leq k_{\text{Domowe paliwa olejowe}} \cdot \mathcal{MS} \]
+
+Rozwiązanie problemu dla zadanych w treści zadania danych wygląda następująco.
+
+\begin{itemize}
+    \item Całkowity koszt produkcji: $1345943600.87\$$
+    \item Ilość ropy B1: $1026030.37t$
+    \item Ilość ropy B2: $0t$
+    \item Ilość paliw silnikowych: $200000t$
+    \item Ilość domowych paliw olejowych: $400000t$
+    \item Ilość ciężkich paliw olejowych: $250000t$
+    \item Ilość destylatu do krakowania: $92190.89t$
+    \item Ilośc oleju do domowych paliw olejowych: $381561.82t$
+    \item Waga siarki w domowych paliwach olejowych: $818.44t$
+\end{itemize}
+
+Podane rozwiązanie spełnia wszystkie ograniczenia z treści zadania, więc jest dopuszczalne.
+
+\section*{Zadanie 4}
+
+W tym zadaniu należy znaleźć grupy zajęciowe z rozkładu ćwiczeń maksymalizując przy tym sumę punktów preferencji przypisaną do każdej grupy zajęciowej przy zadanych ograniczeniach.
+
+Jako parametry do modelu mamy zadane:
+\begin{itemize}
+    \item $C$ - zbiór nazw przedmiotów obowiązkowych,
+    \item $G$ - zbiór numerów grup ćwiczeniowych,
+    \item $D$ - zbiór dni tygodnia,
+    \item $\mathcal{M}$ - maksymalna liczba godzin ćwiczeń w ciągu dnia,
+    \item $GD$ - macierz dni, w których odbywają się ćwiczenia,
+    \item $GTS$ - macierz godzin, o których rozpoczynają się ćwiczenia,
+    \item $GTE$ - macierz godzin, o których kończą się ćwiczenia,
+    \item $P$ - macierz punktów preferencji według grup ćwiczeniowych,
+    \item $SG$ - zbiór grup zajęc sportowych,
+    \item $SGD$ - macierz dni, w których odbywają się ćwiczenia sportowe,
+    \item $SGTS$ - macierz godzin, o których rozpoczynają się ćwiczenia sportowe,
+    \item $SGTE$ - macierz godzin, o których kończą się ćwiczenia sportowe,
+    \item $\mathcal{LS}$ - godzina, o której otwiera się stołówka,
+    \item $\mathcal{LE}$ - godzina, o której zamyka się stołówka,
+    \item $\mathcal{ML}$ - minimalna liczba godzin potrzebnych na zjedzenie posiłku.
+\end{itemize}
+
+Zmienne decyzyjne określają, czy student powinien się zapisać do danej grupy ćwiczeniowej:
+\begin{flalign*}
+    && x_{c,g} \in \{0,1\} && c \in C, g \in G, &&
+\end{flalign*}
+gdzie $x_{c,g} = 1$ oznacza, że student powinien zapisać się do grupy ćwiczeniowej $g$ z przedmiotu $c$.
+Podobnie definiujemy zmienne oznaczające, czy student powinien się zapisać do danej grupy zajęciowej sportowej:
+\begin{flalign*}
+    && y_{sg} \in \{0,1\} && sg \in SG. &&
+\end{flalign*}
+
+Funkcją celu jest suma punktów preferencji przypisanych do grup ćwiczeniowych, na które student powinien się zapisać.
+\[ \max \sum_{c \in C, g \in G} (x_{c,g} \cdot P[c,d]) \]
+
+Pierwsze ograniczenie gwarantuje zapisanie studenta do dokładnie jednej grupy ćwiczeniowej z każdego przedmiotu.
+\begin{flalign*}
+    && \sum_{g \in G} x_{c,g} = 1 && (\forall c \in C) &&
+\end{flalign*}
+
+Drugie ograniczenie zapewnia, że student będzie miał czas na co najmniej jeden sport w tygodniu.
+\begin{flalign*}
+    && \sum_{sg \in SG} y_{sg} \geq 1 &&
+\end{flalign*}
+
+Kolejne ograniczenie zapewnia, że grupy ćwiczeniowe nie będą się pokrywać w czasie.
+\begin{flalign*}
+    && x_{c_1,g_1} + x_{c_2,g_2} \leq 1 && (\forall c_1,c_2 \in C)(\forall g_1,g_2 \in G)(c1 \neq c_2 \wedge &&
+\end{flalign*}
+\begin{flalign*}
+    && && \wedge GD[c_1,g_1]=GD[c_2,g_2] \wedge GTS[c_1,g_1] \leq GTS[c_2,g_2] \wedge GTS[c_2,g_2] \leq GTE[c_1,g_1]) &&
+\end{flalign*}
+
+Kolejne ograniczenie zapewnia, że grupy ćwiczeniowe nie będą się pokrywać z zajęciami sportowymi.
+\begin{flalign*}
+    && x_{c,g} + y_{sg} \leq 1 && (\forall c \in C)(\forall g \in G)(\forall sg \in SG)(GD[c,g]=SGD[sg] \wedge  &&
+\end{flalign*}
+\[ \wedge ((GTS[c,g] \leq SGTS[sg] \wedge SGTS[sg] \leq GTS[c,g]) \vee \]
+\[ \vee (SGTS[sg] \leq GTS[c,g] \wedge GTS[c,g] \leq SGTE[sg]))) \]
+
+Kolejne ograniczenie zapewnia codzienną przerwę na posiłek w godzinach otwarcia stołówki.
+\[ (\forall d \in D) \]
+\[ \sum_{c \in C, g \in G \wedge GD[c,g]=d} (x_{c,g} \cdot (\min(\mathcal{LE},GTE[c,g]) - \max(\mathcal{LS}, GTS[c,g]))) + \]
+\[ + \sum_{sg \in SG \wedge SGD[sg]=d} (y_{sg} \cdot (\min(\mathcal{LE},SGTE[sg]) - \max(\mathcal{LS},SGTS[sg]))) \geq \]
+\[ \geq (\mathcal{LE} - \mathcal{LS}) - \mathcal{ML} \]
+
+Kolejne ograniczenie zapewnia, że student nie będzie miał więcej niż $\mathcal{M}$ godzin ćwiczeń w ciągu dnia.
+\begin{flalign*}
+    && \sum_{c \in C, g \in G \wedge GD[c,g]=d} ( x_{c,g} \cdot (GTE[c,g]-GTS[c,g]) ) \leq \mathcal{M} && (\forall d \in D) &&
+\end{flalign*}
+
+Rozwiązanie optymalne tego problemu daje sumę punktów równą 37 i wygląda następująco.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        Godziny & Poniedziałek & Wtorek & Środa & Czwartek & Piątek \\
+        \hline
+        08:00 & Chemia min. (1) &  &  &  &  \\
+        10:00 &  & Analiza (2) & Algebra (3) &  &  \\
+        10:30 & Chemia org. (2)  & &  &  &  \\
+        13:00 & Sport (1) &  &  &  &  \\
+        17:00 &  &  &  & Fizyka (4) &  \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Nakładam dodatkowe ograniczenia, pierwsze zapewnia, że minimalna liczba punktów preferncji każdej grupy zajęciowej będzie równa $p$ oraz zajęcia będą się odbywały jedynie w dniach ze zbioru $DA$.
+\begin{flalign*}
+    && GP[c,g] \geq x_{c,g} \cdot p && (\forall c \in C)(\forall g \in G) &&
+\end{flalign*}
+\begin{flalign*}
+    && \sum_{d \in D \wedge GD[c,g]=d \wedge d \notin DA} x_{c,g} = 0 && (\forall c \in C)(\forall g \in G) &&
+\end{flalign*}
+
+Rozwiązanie optymalne z dodatkowymi ograniczeniami daje sumę punktów preferencji równą 28 i wygląda następująco.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        Godziny & Poniedziałek & Wtorek & Środa & Czwartek & Piątek \\
+        \hline
+        08:00 & &  &  & Analiza (4)  &  \\
+        10:00 &  & Fizyka (2) & &  &  \\
+        10:30 & Chemia org. (2)  & &  &  &  \\
+        11:00 & & & Sport (2) &  &  \\
+        13:00 & Algebra (1) &  & & Chemia min. (3) &  \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Oba uzyskane rozwiązania są dopuszczalne.
 
 \end{document}

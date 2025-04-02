@@ -1,3 +1,5 @@
+# Mikołaj Krupiński, zadanie 3
+
 set JednostkiDestylacji; # Nazwy jednostek destylacji
 set Produkty; # Nazwy produktów wyjściowych z jednostek destylacji
 set ProduktyKoncowe; # Nazwy produktów końcowych
@@ -14,7 +16,7 @@ param MaksymalnaSiarkaWOlejuDomowym; # Maksymalna zawartość siarki w oleju dom
 var Ropa{JednostkiDestylacji} >= 0; # Ilość ropy do przetworzenia w jednostkach destylacji
 
 var IloscProduktow{JednostkiDestylacji, Produkty} >= 0; # Ilość produktów wyjściowych z jednostek destylacji
-s.t. ilosc_produktow_koncowych {JD in JednostkiDestylacji, P in Produkty}: # Ilość produktów wyjściowych proporcjonalna do wydajności destylacji
+s.t. ilosc_produktow {JD in JednostkiDestylacji, P in Produkty}: # Ilość produktów wyjściowych proporcjonalna do wydajności destylacji
     IloscProduktow[JD, P] = Ropa[JD] * WydajnoscDestylacji[JD, P];
 
 var IloscDestylatuDoKrakowania{JednostkiDestylacji} >= 0; # Ilość destylatu do krakowania w jednostkach destylacji
@@ -60,6 +62,9 @@ solve;
 display Ropa;
 display koszt_produkcji;
 display IloscProduktowKoncowych;
+display IloscDestylatuDoKrakowania;
+display IloscOlejuDoDomowego;
+display WagaSiarkiWOlejuDomowym;
 
 data;
 

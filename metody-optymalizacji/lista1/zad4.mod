@@ -1,3 +1,5 @@
+# Mikołaj Krupiński, zadanie 4
+
 set classes; # Nazwy ćwiczeń obowiązkowych
 set groups := {1..4}; # Numery grup
 set days_of_week := {1..5}; # Numery dni tygodnia, 1 - poniedziałek, ..., 5 - piątek
@@ -21,55 +23,43 @@ set allowed_days_of_week within days_of_week; # Dni tygodnia, w których mogą o
 var x{classes, groups}, binary; # x[c, g] = 1, jeśli student wybiera grupę g ćwiczeń c
 var sport_group_selection{sport_groups}, binary; # sport_group_selection[g] = 1, jeśli student wybiera grupę g zajęć sportowych
 
-maximize groups_preference_sum:
+maximize groups_preference_sum: # Suma punktów preferencji wybranych grup
     sum{c in classes, g in groups} (x[c, g] * groups_preference[c, g]);
 
-s.t. one_group_per_class {c in classes}:
+s.t. one_group_per_class {c in classes}: # Student zapisy do dokładnie jednej grupy z każdego przedmiotu
     sum{g in groups} x[c, g] = 1;
 
-s.t. at_least_one_sport:
+s.t. at_least_one_sport: # Student ma okno na co najmniej jedne zajęcia sportowe
     sum{g in sport_groups} sport_group_selection[g] >= 1;
 
-s.t. no_overlapping_groups {c1 in classes, g1 in groups, c2 in classes, g2 in groups:
+s.t. no_overlapping_groups {c1 in classes, g1 in groups, c2 in classes, g2 in groups: # Zajęcia nie mogą się pokrywać
     c1 != c2 and groups_days[c1, g1] == groups_days[c2, g2] and
     groups_start_time[c1, g1] <= groups_start_time[c2, g2] and groups_start_time[c2, g2] <= groups_end_time[c1, g1]}:
         x[c1, g1] + x[c2, g2] <= 1;
         
 
-s.t. no_overlapping_groups_with_sport {c1 in classes, g1 in groups, sg in sport_groups:
+s.t. no_overlapping_groups_with_sport {c1 in classes, g1 in groups, sg in sport_groups: # Zajęcia sportowe nie mogą się pokrywać z zajęciami
     groups_days[c1, g1] == sport_groups_days[sg] and
-    ((groups_start_time[c1, g1] <= sport_groups_start_time[sg] and sport_groups_end_time[sg] <= groups_start_time[c1, g1]) or
+    ((groups_start_time[c1, g1] <= sport_groups_start_time[sg] and sport_groups_start_time[sg] <= groups_end_time[c1, g1]) or
     (sport_groups_start_time[sg] <= groups_start_time[c1, g1] and groups_start_time[c1, g1] <= sport_groups_end_time[sg]))}:
         x[c1, g1] + sport_group_selection[sg] <= 1;
 
-s.t. max_hours_per_day_satisfaction {d in days_of_week}:
+s.t. max_hours_per_day_satisfaction {d in days_of_week}: # Maksymalna liczba godzin ćwiczeń w ciągu dnia
     sum{c in classes, g in groups: groups_days[c, g] = d} (x[c, g] * (groups_end_time[c, g] - groups_start_time[c, g])) <= max_hours_per_day;
 
-s.t. lunch_break_satisfaction {d in days_of_week}:
-    (sum{c in classes, g in groups: groups_days[c, g] == d and
-        lunch_break_start <= groups_start_time[c, g] and groups_start_time[c, g] < lunch_break_end}
-        (x[c, g] * (min(lunch_break_end, groups_end_time[c, g]) - groups_start_time[c, g])))
+s.t. lunch_break_satisfaction {d in days_of_week}: # Minimalny czas przerwy na lunch
+    (sum{c in classes, g in groups: groups_days[c, g] == d}
+        (x[c, g] * (min(lunch_break_end, groups_end_time[c, g]) - max(lunch_break_start, groups_start_time[c, g]))))
     +
-    (sum{c in classes, g in groups: groups_days[c, g] == d
-        and lunch_break_start < groups_end_time[c, g] and groups_end_time[c, g] <= lunch_break_end
-        and groups_start_time[c, g] < lunch_break_start and groups_start_time[c, g] >= lunch_break_end}
-        (x[c, g] * (groups_end_time[c, g] - max(lunch_break_start, groups_start_time[c, g]))))
-    +
-    (sum{sg in sport_groups: sport_groups_days[sg] == d and
-        lunch_break_start <= sport_groups_start_time[sg] and sport_groups_start_time[sg] < lunch_break_end}
-        (sport_group_selection[sg] * (min(lunch_break_end, sport_groups_end_time[sg]) - sport_groups_start_time[sg])))
-    +
-    (sum{sg in sport_groups: sport_groups_days[sg] == d and
-        lunch_break_start < sport_groups_end_time[sg] and sport_groups_end_time[sg] <= lunch_break_end
-        and sport_groups_start_time[sg] < lunch_break_start and sport_groups_start_time[sg] >= lunch_break_end}
-        (sport_group_selection[sg] * (sport_groups_end_time[sg] - max(lunch_break_start, sport_groups_start_time[sg]))))
+    (sum{sg in sport_groups: sport_groups_days[sg] == d}
+        (sport_group_selection[sg] * (min(lunch_break_end, sport_groups_end_time[sg]) - max(lunch_break_start, sport_groups_start_time[sg]))))
     <= (lunch_break_end - lunch_break_start) - min_lunch_break_time;
 
 # 4.2 constraints
-s.t. min_preference_satisfaction {c in classes, g in groups}:
+s.t. min_preference_satisfaction {c in classes, g in groups}: # Minimalna liczba punktów preferencji grupy ćwiczeniowej
     groups_preference[c, g] >= x[c, g] * min_preference;
 
-s.t. forbidden_days_satisfaction {c in classes, g in groups}:
+s.t. forbidden_days_satisfaction {c in classes, g in groups}: # Zajęcia nie mogą odbywać się w dni, które są zabronione
     sum{d in days_of_week: groups_days[c, g] == d and d not in allowed_days_of_week} x[c,g] = 0;
 
 solve;
