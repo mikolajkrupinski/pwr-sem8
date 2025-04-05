@@ -3,38 +3,33 @@
 #include "cache.hpp"
 #include "distribution.hpp"
 
-std::string orderingName(Ordering order);
-std::string distributionName(Distribution dist);
+std::string strategyToString(Strategy strategy);
+std::string distrubutionTypeToString(DistributionType distType);
 
 int main() {
-  const size_t K_MAX = 50;
-  size_t sizes[] = { 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-  Strategy strategies[] = { FIFO, FWF, LRU, LFU, RAND/*, RMA */ };
-  uint16_t(*(distributions[]))() = {
-    Distribution::uniform,
-    Distribution::harmonic,
-    Distribution::biharmonic,
-    Distribution::geometric
-  };
+  const size_t NO_OF_REPETITIONS = 100;
+  size_t sizes[] = {20, 30, 40, 50, 60, 70, 80, 90, 100};
+  size_t fraction_min = 10, fraction_max = 5;
+  Strategy strategies[] = {FIFO, FWF, LRU, LFU, RAND, RMA};
+  DistributionType distTypes[] = {UNIFORM, HARMONIC, BIHARMONIC, GEOMETRIC};
+  Distribution dist;
 
+  std::cout << "n;k;strategy;distribution;cost" << std::endl;
   for (Strategy strategy : strategies) {
-    for (auto distribution : distributions) {
+    for (DistributionType distType : distTypes) {
       for (size_t n : sizes) {
-        size_t totalCost = 0;
-        for (size_t k = 0; k < K_MAX; k++) {
-
-          std::vector<size_t> counter(101, 0);
-          for (size_t i = 0; i < n; i++) {
-            uint16_t random = randomFromDist(distribution);
-            if (random < 1 || random > 100) {
-              std::cout << random << std::endl;
-            }
-            totalCost += access(list, random, ordering, &counter);
+        for (size_t k = n / fraction_min; k <= n / fraction_max; k++) {
+          size_t totalAccessCost = 0;
+          Cache cache(k, n);
+          for (size_t i = 0; i < n * NO_OF_REPETITIONS; i++) {
+            totalAccessCost +=
+                cache.access(dist.randFromDist(distType, n), strategy);
           }
+          std::cout << n << ";" << k << ";" << strategyToString(strategy) << ";"
+                    << distrubutionTypeToString(distType) << ";"
+                    << totalAccessCost / (double)(n * NO_OF_REPETITIONS)
+                    << std::endl;
         }
-        std::cout << n << ";" << orderingName(ordering) << ";"
-          << distributionName(distribution) << ";" << totalCost / K_MAX
-          << std::endl;
       }
     }
   }
@@ -42,34 +37,32 @@ int main() {
   return 0;
 }
 
-std::string orderingName(Ordering order) {
-  switch (order) {
-  case NONE:
-    return "none";
-
-  case MOVE_TO_FRONT:
-    return "move-to-front";
-
-  case TRANSPOSE:
-    return "transpose";
-
-  case COUNT:
-    return "count";
+std::string strategyToString(Strategy strategy) {
+  switch (strategy) {
+    case FIFO:
+      return "fifo";
+    case FWF:
+      return "fwf";
+    case LRU:
+      return "lru";
+    case LFU:
+      return "lfu";
+    case RAND:
+      return "rand";
+    case RMA:
+      return "rma";
   }
 }
 
-std::string distributionName(Distribution dist) {
-  switch (dist) {
-  case UNIFORM:
-    return "uniform";
-
-  case HARMONIC:
-    return "harmonic";
-
-  case BIHARMONIC:
-    return "biharmonic";
-
-  case GEOMETRIC:
-    return "geometric";
+std::string distrubutionTypeToString(DistributionType distType) {
+  switch (distType) {
+    case UNIFORM:
+      return "uniform";
+    case HARMONIC:
+      return "harmonic";
+    case BIHARMONIC:
+      return "biharmonic";
+    case GEOMETRIC:
+      return "geometric";
   }
 }
