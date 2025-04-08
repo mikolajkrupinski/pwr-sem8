@@ -1,16 +1,15 @@
 P = 17321
 ALPHABET_SIZE = 256
-q_k1 = 0
 
 def hash(s:str) -> int:
     result = 0
     for c in s:
-        result = ((result * ALPHABET_SIZE) + ord(c)) % P
+        result = ((result * ALPHABET_SIZE) % P + ord(c)) % P
     return result
 
 def update_hash(old_s: str, old_hash: int, new_char: str, q_k1: float) -> int:
     return (
-        (old_hash - ord(old_s[0]) * q_k1) * ALPHABET_SIZE + ord(new_char)) % P
+        (old_hash - ord(old_s[0]) * q_k1) % P * ALPHABET_SIZE % P + ord(new_char)) % P
 
 def rabin_karp(x: str, p: str) -> list[int]:
     n = len(x)
