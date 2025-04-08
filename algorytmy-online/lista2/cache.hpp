@@ -15,7 +15,7 @@ enum Strategy {
 };
 
 class Cache {
- private:
+private:
   size_t k;
   size_t n;
   std::vector<uint16_t> inCache;
@@ -27,7 +27,7 @@ class Cache {
   bool find(uint16_t i);
   bool insert(uint16_t i);
 
- public:
+public:
   Cache(size_t k, size_t n) : k(k), n(n), timeStamp(0) {
     timeStamps.resize(n + 1, 0);
     accessCount.resize(n + 1, 0);

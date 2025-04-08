@@ -27,7 +27,7 @@ size_t Cache::access(uint16_t i, Strategy strategy) {
   accessCount[i]++;
 
   if (std::find(markedPages.begin(), markedPages.end(), i) ==
-      markedPages.end()) {
+    markedPages.end()) {
     markedPages.push_back(i);
   }
 
@@ -42,71 +42,71 @@ size_t Cache::access(uint16_t i, Strategy strategy) {
   static std::mt19937 rng(dev());
 
   switch (strategy) {
-    case FIFO:
-      inCache.erase(inCache.begin());
-      inCache.push_back(i);
-      break;
+  case FIFO:
+    inCache.erase(inCache.begin());
+    inCache.push_back(i);
+    break;
 
-    case FWF:
-      inCache.clear();
-      inCache.push_back(i);
-      break;
+  case FWF:
+    inCache.clear();
+    inCache.push_back(i);
+    break;
 
-    case LRU: {
-      size_t minTimeStamp = timeStamp;
-      size_t minIndex = 0;
-      for (size_t j = 1; j < k; j++) {
-        if (timeStamps[inCache[j]] < minTimeStamp) {
-          minTimeStamp = timeStamps[inCache[j]];
-          minIndex = j;
-        }
+  case LRU: {
+    size_t minTimeStamp = timeStamps[inCache[0]];
+    size_t minIndex = 0;
+    for (size_t j = 1; j < k; j++) {
+      if (timeStamps[inCache[j]] < minTimeStamp) {
+        minTimeStamp = timeStamps[inCache[j]];
+        minIndex = j;
       }
-      inCache.erase(inCache.begin() + minIndex);
-      inCache.push_back(i);
-      break;
     }
+    inCache.erase(inCache.begin() + minIndex);
+    inCache.push_back(i);
+    break;
+  }
 
-    case LFU: {
-      size_t minAccessCount = accessCount[inCache[0]];
-      size_t minIndex = 0;
-      for (size_t j = 1; j < k; j++) {
-        if (accessCount[inCache[j]] < minAccessCount) {
-          minAccessCount = accessCount[inCache[j]];
-          minIndex = j;
-        }
+  case LFU: {
+    size_t minAccessCount = accessCount[inCache[0]];
+    size_t minIndex = 0;
+    for (size_t j = 1; j < k; j++) {
+      if (accessCount[inCache[j]] < minAccessCount) {
+        minAccessCount = accessCount[inCache[j]];
+        minIndex = j;
       }
-      inCache.erase(inCache.begin() + minIndex);
-      inCache.push_back(i);
-      break;
     }
+    inCache.erase(inCache.begin() + minIndex);
+    inCache.push_back(i);
+    break;
+  }
 
-    case RAND: {
-      std::uniform_int_distribution<size_t> u(0, k - 1);
-      size_t randIndex = u(rng);
-      inCache.erase(inCache.begin() + randIndex);
-      inCache.push_back(i);
-      break;
-    }
+  case RAND: {
+    std::uniform_int_distribution<size_t> u(0, k - 1);
+    size_t randIndex = u(rng);
+    inCache.erase(inCache.begin() + randIndex);
+    inCache.push_back(i);
+    break;
+  }
 
-    case RMA: {
-      if (markedPages.size() >= k) {
-        markedPages.clear();
-        markedPages.push_back(i);
-      }
-      std::vector<uint16_t> unmarkedPagesIndices;
-      for (size_t j = 0; j < k; j++) {
-        if (std::find(markedPages.begin(), markedPages.end(), inCache[j]) ==
-            markedPages.end()) {
-          unmarkedPagesIndices.push_back(j);
-        }
-      }
-      std::uniform_int_distribution<size_t> uniformUnmarked(
-          0, unmarkedPagesIndices.size() - 1);
-      inCache.erase(inCache.begin() +
-                    unmarkedPagesIndices[uniformUnmarked(rng)]);
-      inCache.push_back(i);
-      break;
+  case RMA: {
+    if (markedPages.size() >= k) {
+      markedPages.clear();
+      markedPages.push_back(i);
     }
+    std::vector<uint16_t> unmarkedPagesIndices;
+    for (size_t j = 0; j < k; j++) {
+      if (std::find(markedPages.begin(), markedPages.end(), inCache[j]) ==
+        markedPages.end()) {
+        unmarkedPagesIndices.push_back(j);
+      }
+    }
+    std::uniform_int_distribution<size_t> uniformUnmarked(
+      0, unmarkedPagesIndices.size() - 1);
+    inCache.erase(inCache.begin() +
+      unmarkedPagesIndices[uniformUnmarked(rng)]);
+    inCache.push_back(i);
+    break;
+  }
   }
 
   return 1;

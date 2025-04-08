@@ -6,14 +6,14 @@
 enum DistributionType { UNIFORM, HARMONIC, BIHARMONIC, GEOMETRIC };
 
 class Distribution {
- private:
+private:
   std::random_device dev;
   std::mt19937 rng;
 
   double _harmonic(uint16_t n);
   double _biharmonic(uint16_t n);
 
- public:
+public:
   Distribution() { rng.seed(dev()); }
 
   uint16_t uniform(uint16_t max);

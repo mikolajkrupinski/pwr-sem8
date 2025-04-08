@@ -61,15 +61,15 @@ uint16_t Distribution::geometric(uint16_t n) {
 
 uint16_t Distribution::randFromDist(DistributionType distType, uint16_t n) {
   switch (distType) {
-    case UNIFORM:
-      return uniform(n);
-    case HARMONIC:
-      return harmonic(n);
-    case BIHARMONIC:
-      return biharmonic(n);
-    case GEOMETRIC:
-      return geometric(n);
-    default:
-      return n;
+  case UNIFORM:
+    return uniform(n);
+  case HARMONIC:
+    return harmonic(n);
+  case BIHARMONIC:
+    return biharmonic(n);
+  case GEOMETRIC:
+    return geometric(n);
+  default:
+    return n;
   }
 }
