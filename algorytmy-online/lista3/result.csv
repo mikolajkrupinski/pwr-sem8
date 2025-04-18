@@ -1,4 +1,4 @@
-strategy;distribution;avg-bins;avg-opt-bins;concurrency
+strategy;distribution;avg-bins;avg-opt-bins;competitive-ratio
 next-fit;uniform;65.0031;50.5204;1.28667
 next-fit;harmonic;65.1646;50.5338;1.28953
 next-fit;biharmonic;65.6881;50.542;1.29967

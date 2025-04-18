@@ -18,7 +18,7 @@ int main() {
   std::mt19937 rng(dev());
   std::uniform_real_distribution<double> ud(0.0, 1.0);
 
-  std::cout << "strategy;distribution;avg-bins;avg-opt-bins;concurrency"
+  std::cout << "strategy;distribution;avg-bins;avg-opt-bins;competitive-ratio"
             << std::endl;
   for (Strategy strategy : strategies) {
     for (DistributionType distType : distTypes) {
