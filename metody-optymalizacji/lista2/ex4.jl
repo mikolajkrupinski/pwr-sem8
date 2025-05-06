@@ -1,5 +1,5 @@
 using JuMP
-using GLPK
+using Cbc
 
 p = 1 # liczba zasobów
 N = [30] # limit zasobów
@@ -8,9 +8,9 @@ ts = [50, 47, 55, 46, 32, 57, 15, 62] # czasy wykonania czynności
 r = [[9], [17], [11], [4], [13], [7], [7], [17]] # zapotrzebowanie na zasoby
 pred = [(1, 2), (1, 3), (1, 4), (2, 5), (3, 6), (4, 6), (4, 7), (5, 8), (6, 8), (7, 8)] # zależności między czynnościami
 
-T = sum(ts)
+T = sum(ts) + 1
 
-model = Model(GLPK.Optimizer)
+model = Model(Cbc.Optimizer)
 
 @variable(model, x[1:n, 1:T], Bin) # 1 iff task i starts at time j
 @variable(model, c_max >= 0, Int)

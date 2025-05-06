@@ -1,0 +1,18 @@
+{
+    "no_of_tasks": 3,
+    "task_times": [
+        1,
+        10,
+        8
+    ],
+    "task_weights": [
+        2,
+        50,
+        1
+    ],
+    "task_earliest_start": [
+        1,
+        4,
+        1
+    ]
+}
