@@ -1,0 +1,67 @@
+\documentclass[12pt]{article}
+\usepackage{algorithm2e}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{polski}
+\geometry{a4paper, margin=1in}
+
+\title{Rozwiązanie Listy 2 z Metod Optymalizacji}
+\author{Mikołaj Krupiński}
+
+\begin{document}
+
+\maketitle
+
+\section*{Zadanie 1}
+
+W pierwszym zadaniu należy zaplanować cięcia desek w tartaku produkującym deski o~ustalonej szerokości $W$ w calach według zapotrzebowania $d_1, d_2, \dots, d_k$ na deski o szerokościach $w_1, w_2 \dots, w_k$ w calach.
+
+W tym celu wyznaczam wszytskie możliwości cięcia desek o szerokości $W$ na deski o~szerokościach $w_1, w_2 \dots, w_k$. Oznaczmy je jako $c_1, c_2, \dots, c_n$. Każde $c_i$ jest postaci $(i_1, i_2, \dots, i_k)$, gdzie $i_j$ jest liczbą naturalną oznaczającą ilość desek o szerokości $w_j$ w~cięciu $c_i$.
+
+Celem zadania jest znalezienie harmonogramu produkcji minimalizaującego łączne odpadadki desek.
+
+Zmiennymi decyzyjnymi w proponowanym modelu są
+\begin{flalign*}
+    && x_{i} && i \in \{1,\dots,n\}, &&
+\end{flalign*}
+gdzie $x_i$ oznacza liczbę desek ciętych w sposób $c_i$.
+
+Jedyne ograniczenie zapewnia zaspokojenie zapotrzebowania na deski każdej szerokości.
+\begin{flalign*}
+    && \sum_{j=1}^{n} \left( x_j \cdot c_{i,j} \right) \geq d_i && \forall i \in \{1,\dots,k\} &&
+\end{flalign*}
+
+Funckją celu jest suma wyprodukowanych odpadków desek.
+$$ W \cdot \left( \sum_{i=1}^{n} x_i \right) - \left( \sum_{i=0}^{k} w_i \cdot d_i \right) \to min $$
+
+Dla danych podanych w treści zadania łączna ilość odpaków wynosi 18 cali, a cięcia deski wyglądają następująco.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        Sposób cięcia & Ilość cięć \\ [0.5ex]
+        \hline
+        7 7 5 3 & 37 \\
+        7 5 5 5 & 28 \\
+        7 3 3 3 3 3 & 9 \\
+        \hline
+    \end{tabular}
+    \caption{Cięcia desek}
+\end{table}
+
+\section*{Zadanie 2}
+
+
+
+\end{document}
