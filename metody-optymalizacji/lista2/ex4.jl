@@ -41,7 +41,7 @@ end
 println()
 
 for t in 1:T
-    if sum(value(x[i, s]) for i in 1:n, s in t:T) == 0
+    if sum(value(x[i, s]) for i in 1:n, s in max(1, t - maximum(ts) + 1):T) == 0
         return
     end
 
