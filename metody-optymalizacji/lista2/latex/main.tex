@@ -32,7 +32,7 @@ Celem zadania jest znalezienie harmonogramu produkcji minimalizaującego łączn
 
 Zmiennymi decyzyjnymi w proponowanym modelu są
 \begin{flalign*}
-    && x_{i} && i \in \{1,\dots,n\}, &&
+    && x_{i} \in \mathbb{N} && i \in \{1,\dots,n\}, &&
 \end{flalign*}
 gdzie $x_i$ oznacza liczbę desek ciętych w sposób $c_i$.
 
@@ -62,6 +62,30 @@ Dla danych podanych w treści zadania łączna ilość odpaków wynosi 18 cali, 
 
 \section*{Zadanie 2}
 
+W drugim zadaniu dany jest zbiór zadań $J=\{1,\dots,n\}$, które muszą zostać wykonane na jednej maszynie. Dla każdego zadania $j \in J$ dany jest czas jego wykonania $p_j$, waga $w_j$ oraz moment $r_j$ przed, którym nie może ono być rozpoczęte. Celem jest znalezienie harmonogramu minimalizującego ważony czas zakończenia zadań, tj. $\sum_{j \in J} w_j \cdot C_j$, gdzie $C_j$ oznacza czas zakończenia zadania $j$.
 
+Oznaczmy maksymalny możliwy czas zakończenia wszytskich zadań jako $T = \max_{j \in J}\{r_j\} + \sum_{j \in J}p_j + 1$. Wtedy zmiennymi decyzyjnymi są
+\begin{flalign*}
+    && x_{j,t} \in \{0,1\} && j \in J, t \in \{1,\dots,T\}, &&
+\end{flalign*}
+gdzie $x_{j,t} = 1$ oznacza, że zadanie $j$ rozpoczyna się w czasie $t$.
+
+Każde zadanie $j$ powinno zostać wykonane dokładnie raz. Stąd poniższe ograniczenie.
+\begin{flalign*}
+    && \sum_{t=1}^{T} x_{j,t} = 1 && \forall j \in J &&
+\end{flalign*}
+
+Należy także zapewnić, że każde zadanie $j$ rozpocznie się najwcześniej w momencie $r_j$.
+\begin{flalign*}
+    && \sum_{t=0}^{r_j-1} x_{j,t} = 0 && \forall j \in J &&
+\end{flalign*}
+
+Ponadto zadania nie mogą być wykonywane równocześnie.
+\begin{flalign*}
+    && \sum_{j \in J} \left(\sum_{s=\max\{1,t+1-p_j\}}^{t} x_{j_s} \right) \leq 1 && \forall t \in \{1,\dots,T\} &&
+\end{flalign*}
+
+Funckją celu jest suma ważonych czasów zakończenia zadań.
+$$ \sum_{j \in J} \sum_{t=1}^{T} \left( x_{j,t} \cdot w_j \cdot (t - 1 + p_j) \right) \to min $$
 
 \end{document}
