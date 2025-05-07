@@ -1,7 +1,7 @@
 # Mikołaj Krupiński
 
 using JuMP
-using GLPK
+using Cbc
 using JSON
 
 if length(ARGS) != 1
@@ -19,7 +19,7 @@ earliest_start = data["task_earliest_start"]
 
 max_time = maximum(earliest_start) + sum(times) + 1
 
-model = Model(GLPK.Optimizer)
+model = Model(Cbc.Optimizer)
 
 # x[i, j] == 1 iff zadanie i rozpoczyna się w czasie j
 @variable(model, x[1:no_of_tasks, 1:max_time], Bin)

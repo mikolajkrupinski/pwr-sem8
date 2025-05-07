@@ -68,7 +68,7 @@ Oznaczmy maksymalny możliwy czas zakończenia wszytskich zadań jako $T = \max_
 \begin{flalign*}
     && x_{j,t} \in \{0,1\} && j \in J, t \in \{1,\dots,T\}, &&
 \end{flalign*}
-gdzie $x_{j,t} = 1$ oznacza, że zadanie $j$ rozpoczyna się w czasie $t$.
+gdzie $x_{j,t} = 1$ oznacza, że zadanie $j$ rozpoczyna się w momencie $t$.
 
 Każde zadanie $j$ powinno zostać wykonane dokładnie raz. Stąd poniższe ograniczenie.
 \begin{flalign*}
@@ -87,5 +87,63 @@ Ponadto zadania nie mogą być wykonywane równocześnie.
 
 Funckją celu jest suma ważonych czasów zakończenia zadań.
 $$ \sum_{j \in J} \sum_{t=1}^{T} \left( x_{j,t} \cdot w_j \cdot (t - 1 + p_j) \right) \to min $$
+
+% wstawić dane i wyiki
+% Objective value: 19681.0
+% Task 1 : ( 49 62 )
+% Task 2 : ( 41 43 )
+% Task 3 : ( 23 40 )
+% Task 4 : ( 44 48 )
+% Task 5 : ( 5 15 )
+% Task 6 : ( 16 22 )
+% Task 7 : ( 88 89 )
+% Task 8 : ( 63 78 )
+% Task 9 : ( 79 87 )
+% Task 10 : ( 1 4 )
+
+\section*{Zadanie 3}
+
+W trzecim zadaniu podobnie mamy zbiór zadań $J=\{1,\dots,n\}$, który musi zostać wykonany na $m$ maszynach. Dla każdego zadania $i$ dany jest czas jego wykonania $p_i$. Ponadto dany jest częściowy porządek $P$ na zbiorze zadań $J$ postaci $P=\{(i_1,i_2),\dots,(i_{k-1},i_k)\}$, który oznacza, że zadanie $i_1$ musi zostać wykonane przed rozpoczęciem zadania $i_2$ i podobnie dla pozostałych par. Celem jest znalezienie harmonogramy, który minimalizuje czas zakończenia wszytskich zadań. Oznaczmy go przez $C_{max}$.
+
+Podobnie jak w poprzednim zadaniu Oznaczmy maksymalny możliwy czas zakończenia wszytskich zadań jako $T = \sum_{i \in J}p_i + 1$.
+
+Zmiennymi decyzyjnymi w moim modelu są
+\begin{flalign*}
+    && x_{i,j,t} \in \{0,1\} && i \in J, j \in \{1,\dots,m\}, t \in \{1,\dots,T\}, &&
+\end{flalign*}
+gdzie $x_{i,j,t} = 1$ oznacza, że zadanie $i$ rozpoczyna się na maszynie $j$ w momencie $t$. Ponadto dodaję pomocniczą zmienną decyzyjną oznaczającą czas zakończenia ostatniego zadania.
+$$ C_{max} \in \mathbb{N} $$
+
+% # c_max jest nie mniejszy niż czas zakończenia każdego zadania
+% @constraint(model, [i in 1:n, j in 1:m, t in 1:T], c_max >= (t + p[i] - 1) * x[i, j, t])
+
+Pierwsze ograniczenie zapewnia, że $C_{max}$ ma wartość nie mniejszą niż czas zakończenia każdego z zadań.
+\begin{flalign*}
+    && C_{max} \geq x_{i,j,t}(t+-1+p_i) && \forall i \in J, j \in \{1,\dots,m\}, t \in \{1,\dots,T\}
+\end{flalign*}
+
+Kolejne ograniczenie zapewnia, że każde zadanie zostanie wykonane dokładnie raz na jednej z maszyn.
+\begin{flalign*}
+    && \sum_{j=1}^{m} \sum_{t=1}^{T} x_{i,j,t} = 1 && \forall i \in J &&
+\end{flalign*}
+
+Zadania na jednej maszynie nie mogą być wykonywane równocześnie.
+\begin{flalign*}
+    && \sum_{i \in J} \left( \sum_{s=\max\{1,t+1-p_i\}}^{t} x_{i,j,s} \right) \leq 1 && \forall j \in \{1,\dots,m\}, t \in \{1,\dots,T\} &&
+\end{flalign*}
+
+Na koniec musimy zapewnić, że częściowy porządek $P$ jest spełniony, czyli każde zadanie wykonuje się po swoim poprzedniku.
+\begin{flalign*}
+    && \sum_{j=1}^{m} \sum_{t=1}^{T+1-p_i} x_{i,j,t} (t - 1 + p_i) \leq \sum_{j=1}^{m} \sum_{t=1}^{T+1-p_k} x_{k,j,t} (t - 1 + p_k) && \forall (i,k) \in P &&
+\end{flalign*}
+
+Funckją celu jest $C_{max}$, które minimalizujemy.
+$$ C_{max} \to min $$
+
+% wstawić wyniki
+
+\section*{Zadanie 4}
+
+W czwartym zadaniu musimy wykonać zbiór czynności $Z=\{1,\dots,n\}$ przy użyciu $p$ zasobów $R_1,\dots,R_p$. Dla każdego zasobu $R_i$ dany jest jego limit $N_i$. Dla każdej czynności $j$ znamy czas jej wykonania $p_j$ oraz wektor zasobów $\boldsymbol{r}_j=[r_1,\dots,r_p]$ potrzebnych do jego wykonania.
 
 \end{document}
