@@ -1,0 +1,169 @@
+\documentclass[12pt]{article}
+\usepackage{algorithm2e}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{amsthm}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyvrb}
+\usepackage{polski}
+\geometry{a4paper, margin=1in}
+
+\newtheorem{definition}{Definicja}
+\newtheorem{theorem}{Twierdzenie}
+\newtheorem{conclusion}{Wniosek}
+
+\title{Opracowanie problemu maksymalnego zbioru niezależnego w grafie}
+\author{Mikołaj Krupiński}
+
+\begin{document}
+
+\maketitle
+
+\section{Wprowadznie i definicja problemu}
+
+Problem maksymalnego zbioru niezależnego znajduje szerokie zastosowanie w nauce, jak i w biznesie. Jest on na przykład wykorzystywany do rozmieszczania czujników w sieciach, planowania egzaminów lub harmonogramów, analiza społeczności w sieciach społecznościowych oraz analiza sieci białkowych w bioinformatyce.
+
+Zdefiniujmy najpierw pojęcie zbioru niezależnego.
+
+\begin{definition}
+    \textbf{Zbiór niezależny} w grafie nieskierowanym $G=(V,E)$ to podzbiór zbioru wierzchołków $I \subseteq V$ taki, że $(\forall u,v \in I)(\forall e \in E)(u \neq v \implies u \notin e \vee v \notin e)$.
+\end{definition}
+
+Zdefiniujmy odpowiednio pojęcie maksymalnego zbioru niezależnego.
+
+\begin{definition}
+    \textbf{Maksymalny zbiór niezależny} w grafie nieskierowanym $G=(V,E)$ to zbiór niezależny $I \subseteq V$ taki, że nie istnieje żaden zbiór niezależny $J \subseteq V$ taki, że $I \subset J$.
+\end{definition}
+
+Problem maksymalnego zbioru niezależnego (\texttt{MIS}) polega na znalezieniu maksymalnego zbioru niezależnego w wejściowym grafie nieskierowanym $G=(V,E)$.
+
+\section{Trudność problemu}
+
+Na potrzeby tego rozdziału rozważmy problem maksymalnego zbioru niezależnego w postaci decyzyjnej. Pytamy, czy w grafie nieskierowanym $G=(V,E)$ istnieje zbiór niezależny $I \subseteq V$ o mocy co najmniej $k \in \mathbb{N}$.
+
+\begin{theorem}
+    Problem maksymalnego zbioru niezależnego jest w klasie NP.
+\end{theorem}
+
+\begin{proof}
+    Rozważmy graf nieskierowany $G=(V,E)$. Można skonstruować maszynę Turinga $M$, która niedeterministycznie wyznacza zbiór $I \subseteq V$ taki, że $|I| \geq k$. Maszyna $M$ sprawdza następnie, czy zbiór $I$ jest niezależny, czyli czy żadne dwa wierzhołki $u,v \in I$ nie są połączone krawędzią. Sprawdzenie, czy zbiór $I$ jest niezależny można wykonać w czasie $O(|E|)$, czyli wielomianowym względem wielkości grafu $G$. Zatem $M \in NP$, a stąd problem maksymalnego zbioru niezależnego jest w klasie NP.
+\end{proof}
+
+\begin{theorem}
+    Problem maksymalnego zbioru niezależnego jest NP-trudny \cite{karp2009reducibility}.
+\end{theorem}
+
+\begin{proof}
+    Przeprowadzimy redukcję problemu 3SAT (znanego problemu NP-zupełnego) do problemu zbioru niezależnego.
+
+    Rozważmy dowolną instancję problemu 3SAT. Mamy formułę postaci
+    $$ \phi(x_1,\dots,x_n) = \bigwedge\limits_{i=1}^{m} (l_{i1} \vee l_{i2} \vee l_{i3}). $$
+    Zbudujmy graf $G=(V,E)$, gdzie
+    $$ V = \{ l_{ij} : i \in \{1,\dots,m\} \wedge j \in \{1,2,3\} \}, $$
+    a zbiór krawędzi budujemy w następujący sposób:
+    \begin{itemize}
+        \item dla każej klauzuli $(l_{i1} \vee l_{i2} \vee l_{i3})$ tworzymy trójkąt z krawędzi $l_{i1}$, $l_{i2}$ i $l_{i3}$,
+        \item łączymy krawędzią wszytskie literały $l_{ij}$ i $l_{kl}$ takie, że $l_{ij} = \neg l_{kl}$.
+    \end{itemize}
+    W ten sposób do zbioru niezależnego może należeć co najwyżej jeden wierzchołek reprezentujący zmienną z każdego literału oraz nie mogą należeć jednocześnie wierzchołki reprezentujące $x$ i $\neg x$ dla żadnej ze zmiennych.
+
+    Redukcja jest możliwa w pamięci logarytmicznej.
+
+    Graf $G$ ma zbiór niezależny o mocy co najmniej $k=m$ wtedy i tylko wtedy, gdy istnieje wartościowanie zmiennych spełeniające formułę $\phi$.
+\end{proof}
+
+\begin{conclusion}
+    Problem maksymalnego zbioru niezależnego jest NP-zupełny.
+\end{conclusion}
+
+\section{Dokładne algorytmy}
+
+Problem pozostaje trudny obliczeniowo dla ograniczonego maksymalnego stopnia grafu. Istnieją jednak algorytmy działające w czasie wielomianowym, gdzie podstawa potęgi jest bliska jedynki \cite{xiao2013confining, xiao2016exact, xiao2017refined}, zatem mogą być one w miarę efektywnie obliczane dla małych i średnich grafów. Istnieją również metody wyznaczania \texttt{MIS} dla innych szczególnych przypadków, jednak skupiam się tutaj głównie na algorytmach działających w ogólności na wszytskich grafach.
+
+Naiwny algorytm znajdujący maksymalny zbiór niezależny ma złożoność obliczeniową $O(n^22^n)$, ponieważ musi on w najgorszym przypadku przejść przez wszystkie podzbiory zbioru wierzchołków i sprawdzić dla każdego z nich, czy żadne dwa wierzchołki nie są połączone krawędzią. Wszytskie poniższe algorytmy pracują w pamięci wielomianowej chyba, że wspomniano inaczej.
+
+Pierwsza poprawa naiwnego algorytmu została zaproponowana przez Tarjana i Trojanowskiego w roku 1977 \cite{tarjan1977finding}, gdzie dzięki stosowaniu rekursywnej metody z rozgałęzieniami (\textit{backtracking}) poprawiono złożoność dokładnego algorytmu wyznaczającego \texttt{MIS} do $O(2^{n/3})$. Autorzy skupiają się na dokładnej analizie przypadków dla wierzchołków o różnych stopniach oraz mechaniźmie dominacji, który pozwala ograniczyć liczbę rozpatrywanych podproblemów.
+
+Kolejne algorytmy opisywane w tym rozdziale są często ulepszeniami wcześniej opisanych. Jest tak w przypadku pracy Tang Jian z roku 1986 \cite{jian19862}. Główne innowacje obejmują bardziej agresywne strategie wyboru wierzchołków do rozgałęziania, optymalizację porządku przetwarzania oraz lepsze wykorzystanie struktur grafowych do eliminowania nieopłacalnych gałęzi. Dodatkowo Jian wprowadza technikę akceleracji opartą na analizie lokalnej struktury grafu i heurystykach, co pozwala uniknąć niepotrzebnych wywołań rekurencyjnych. Osiągnięto w nim złożoność obliczeniową $O(2^{0.304n})$ dla najgorszego przypadku.
+
+Kolejna praca również z 1986 roku \cite{robson1986algorithms} jest ulepszeniem algorytmu zaproponowanego przez Tarjana i Trojanowskiego. Uzyskano w nim jeszcze lepsze górne ograniczenie na czas działania algorytmu w najgorszym przypadku, czyli $O(2^{0.276n})$. Zostało to osiągnięte dzięki zmodyfikowanie rekurencyjnego algorytmu w oparciu o głębszą analizę możliwych podgrafów wokół konkretnej krawędzi. Zostało także udowodnione lepsze górne ograniczenie na czas wykonania poprzez dokładną analizę grafów regularnych, które można było pominąć w rozważaniach, jak zostało to pokazane. Zaproponowany algorytm działa jednak w wykładniczej pamięci.
+
+TODO: [8]
+
+TODO: [9]
+
+TODO: [10]
+
+TODO: [11]
+
+TODO: [12]
+
+TODO: [13]
+
+W tabeli \ref{tbl:mis-exact} prezentuję przedstawione w tym rozdziale prace i najważniejsze informacje o nich. Złożoność obliczeniowa odnosi się do najgorszego przypadku i jest podana dla grafu $G=(V,E)$, gdzie $|V|=n$ oraz $|E|=m$.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        Praca & Rok wydania & Złożoność obliczeniowa \\
+        \hline
+        \cite{tarjan1977finding} & 1977 & $O(2^{n/3})$ \\
+        \hline
+        \cite{jian19862} & 1986 & $O(2^{0.304n})$ \\
+        \hline
+        \cite{robson1986algorithms} & 1986 & $O(2^{0.276n})$ \\
+        \hline
+        \cite{beigel1999finding} & 1999 & $O(2^{0.114m})$ \\
+        \hline
+        \cite{robson2001finding} & 2001 & $O(2^{n/4})$ \\
+        \hline
+        \cite{furer2006faster} & 2006 & $1.2365^{m-n}n^{O(1)}$ \\
+        \hline
+        \cite{kneis2009fine} & 2009 & $1.2132^nn^{O(1)}$ \\
+        \hline
+        \cite{bourgeois2012fast} & 2012 & $1.2114^nn^{O(1)}$ \\
+        \hline
+        \cite{xiao2017exact} & 2017 & $1.1996^nn^{O(1)}$ \\
+        \hline
+    \end{tabular}
+    \caption{Najważniejsze dokładne algorytmy dla \texttt{MIS}}
+    \label{tbl:mis-exact}
+\end{table}
+
+\section{Aproksymacja}
+
+Wiadomo, że nie istnieje żadna stała, dla której problem maksymalnego zbioru niezależnego jest aproksymowalny, o ile $P \neq NP$ \cite{trevisan2014inapproximability}.
+
+Istnieją jednak algorytmy aproksymujące \texttt{MIS} dla stałej zależnej od pewnego parametru grafowego. Przykładem takiego algorytmu jest $\Delta$-aproksymacja zaproponowana w 2017 roku \cite{bar2017distributed}, gdzie $\Delta$ jest maksymalnym stopniem w grafie. Nie jest to przeważnie zadowalające rozwiązanie, ponieważ już dla grafów o $\Delta=3$ algorytm może zwrócić zbiór niezależny aż 3 razy mniejszy niż maksymalny w danym grafie. Jednak zwrócony zbiór niezależny może być dobrym rozwiązaniem startowym dla algorytmów heurystycznych, które dalej je ulepszą.
+
+\section{Heurystyki}
+
+Ze względu na trudność obliczeniową problemu \texttt{MIS} dla roziwązywania problemów w większych grafach konieczne jest użycie heurystyk zwracających przybliżone, a nie dokładne rozwiązania.
+
+Jedną z metod jest wykorzystanie algorytmów genetycznych \cite{nayeem2007genetic}. Metoda opisany w pracy opiera się na reprezentacji potencjalnych rozwiązań jako chromosomów binarnych, w których każdy bit odpowiada jednemu wierzchołkowi grafu – wartość 1 oznacza, że wierzchołek należy do zbioru niezależnego, a 0, że nie. Początkowa populacja jest generowana losowo, a następnie ewoluuje przez kolejne pokolenia z wykorzystaniem klasycznych operatorów genetycznych: selekcji, krzyżowania (crossover) oraz mutacji. Kluczowym aspektem działania algorytmu jest funkcja dopasowania (fitness function), która nagradza rozwiązania za dużą sumę wag wierzchołków przy jednoczesnym karaniu tych, które łamią warunek niezależności (czyli zawierają sąsiadujące wierzchołki). Dzięki temu ewolucja populacji jest ukierunkowana w stronę coraz lepszych — choć niekoniecznie optymalnych — zbiorów. Ograniczenia niezależności są również częściowo uwzględniane w fazie mutacji, np. przez usuwanie kolidujących wierzchołków. Całość procesu kończy się, gdy osiągnięto ustaloną liczbę pokoleń lub stabilizację najlepszego osobnika.
+
+Inną metodą jest użycie algorytmu fazowego przeszukiwania lokalnego (\textit{phased local search}) \cite{pullan2009optimisation}. Algorytm opisany w pracy stosuje wersję stochastycznego algorytmu lokalnego przeszukiwania opartego na dwóch naprzemiennych fazach. Faza poprawy: algorytm stopniowo dodaje wierzchołki do aktualnego rozwiązania, poprawiając jego jakość. Faza przeszukiwania „płaskowyżu” (\textit{plateau search}): wykonywane są zamiany między wierzchołkami wewnątrz i poza aktualnym rozwiązaniem, aby uniknąć utknięcia w lokalnym optimum.
+
+Kolejną metodą jest \textit{tabu search} \cite{wu2012multi}. Proponowany algorytm łączy trzy różne rodzaje ruchów lokalnych (dodanie, usunięcie i zamiana wierzchołków) w jednej złożonej strukturze sąsiedztwa, co pozwala na bardziej elastyczne i skuteczne przeszukiwanie przestrzeni rozwiązań. Dodatkowo, wykorzystuje mechanizm tabu z dynamicznym czasem trwania zakazu i strategią restartów w celu uniknięcia utknięcia w lokalnych optimum. Testy przeprowadzone na 136 standardowych instancjach wykazały, że algorytm osiąga lepsze wyniki niż wcześniejsze podejścia, często znajdując nowe najlepsze rozwiązania.
+
+Nowszym podejściem jest przekształcenie \texttt{MIS} do problemu binarnego programowania kwadratowego (BQP) \cite{wang2016solving}. W odróżnieniu od tradycyjnych metod, autorzy pokazują, że problem można modelować jako BQP i następnie efektywnie rozwiązywać przy użyciu probabilistycznej wersji \textit{tabu search} zoptymalizowanej pod kątem tego ogólnego modelu. Eksperymenty przeprowadzone na 80 instancjach benchmarków DIMACS-W oraz 40 BHOSLIB-W potwierdziły skuteczność podejścia: algorytm osiąga konkurencyjne lub lepsze wyniki w porównaniu z wyspecjalizowanymi metodami dla problemu maksymalnego zbioru niezależnego, pomimo że sam algorytm nie jest dostrojony specjalnie pod ten typ problemu. Praca podkreśla elastyczność BQP jako uniwersalnego narzędzia modelowania problemów kombinatorycznych.
+
+\section{Algorytmy kwantowe}
+
+Jednym z najnowszych osiągnieć jest zastosowanie metod obliczeń kwantowych do roziwązywania problemów trudnych obliczeniowo. W 2022 roku opracowano metodę zapisu problemu \texttt{MIS} na wyżarzaczu kwantowym pozwalającą na osiągnięcie rozwiązania optymalnego lub rozwiązania bliskiego optymalnemu dla grafów składających się z ponad 200 wierzchołków \cite{ebadi2022quantum}. Autorzy pracy użyli atomów Rydberga ułożonych w dwuwymiarowej macierzy. Jest to znaczący krok w kierunku praktycznego wykorzystania komputerów kwantowych opartych na neutralnych atomach do rozwiązywania problemów optymalizacyjnych z klasy NP-trudnych.
+
+\newpage
+
+\bibliographystyle{unsrt}
+\bibliography{bibliography}
+
+\end{document}
