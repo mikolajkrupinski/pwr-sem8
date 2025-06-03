@@ -82,27 +82,28 @@ function scheduling_approximation(J::Int64, M::Int64, p::Matrix{Int64})
 
     # Find perfect matching in graph H
     # Assign all leafs (machines with only one job) to their jobs
-    for i in 1:M
-        if sum(H[i, :]) == 1
-            for j in 1:J
-                if H[i, j] == 1
-                    assignment[j] = i
-                    H[:, j] .= 0
-                    break
-                end
+    leafs_found = true
+    while leafs_found
+        leafs_found = false
+        for i in 1:M
+            if sum(H[i, :]) == 1
+                leafs_found = true
+                j = findfirst(H[i, :] .== 1)
+                assignment[j] = i
+                H[:, j] .= 0
             end
         end
     end
-    # Assign all remaining jobs to machines)
-    for j in 1:J
-        if assignment[j] == 0
-            for i in 1:M
-                if H[i, j] == 1
-                    assignment[j] = i
-                    H[:, j] .= 0
-                    break
-                end
-            end
+
+    # Assign all remaining jobs to machines (even cycles)
+    while sum(assignment .== 0) > 0
+        job = findfirst(assignment .== 0)
+        while job !== nothing
+            machine = findfirst(H[:, job] .== 1)
+            assignment[job] = machine
+            H[:, job] .= 0
+            job = findfirst(H[machine, :] .== 1)
+            H[machine, :] .= 0
         end
     end
 
