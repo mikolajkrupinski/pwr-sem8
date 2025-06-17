@@ -3,12 +3,12 @@
 #include <vector>
 
 class Reservoir {
- private:
+private:
   size_t n;
   size_t l;
   double p;
 
- public:
+public:
   Reservoir() : n(0) {}
 
   void on_get(double x) {
@@ -26,14 +26,14 @@ class Reservoir {
 };
 
 class ReservoirFastForward {
- private:
+private:
   size_t n;
   std::vector<size_t> next;
   size_t next_idx;
   size_t l;
   double p;
 
- public:
+public:
   ReservoirFastForward() : n(0), next_idx(0) {}
 
   void on_init(size_t max_size) {
@@ -66,14 +66,16 @@ class ReservoirFastForward {
 };
 
 int main() {
+  const size_t STREAM_LENGTH = 50;
+
   Reservoir r;
-  for (size_t i = 0; i < 50; i++) {
+  for (size_t i = 0; i < STREAM_LENGTH; i++) {
     r.on_get(0.0);
   }
   std::cout << std::endl;
 
   ReservoirFastForward rff;
-  rff.on_init(50);
+  rff.on_init(STREAM_LENGTH);
   std::cout << std::endl;
 
   return 0;
